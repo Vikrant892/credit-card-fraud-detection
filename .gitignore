@@ -32,6 +32,9 @@ env/
 # plots (regenerate with evaluate.py)
 *.png
 
+# secrets
+.env
+
 # OS
 .DS_Store
 Thumbs.db
