@@ -1,315 +1,831 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FraudShield - Real-Time Credit Card Fraud Detection</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FRDS&lt;GO&gt; FRAUD DETECTION TERMINAL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-  --bg: #000000; --text: #F5F5F7; --secondary: #86868B; --accent: #2997FF;
-  --card-bg: rgba(28,28,30,0.8); --border: rgba(255,255,255,0.08);
-  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', system-ui, sans-serif;
-  --radius-card: 18px; --radius-input: 12px; --radius-pill: 100px;
-  --green: #30D158; --red: #FF453A; --yellow: #FFD60A; --orange: #FF9F0A;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0a0a;
+  --fg:#f5a623;
+  --dim:#8a7f5a;
+  --pos:#6ab04c;
+  --neg:#eb4d4b;
+  --line:#3a2f14;
+  --hl:#1a1305;
 }
-body { background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.6; -webkit-font-smoothing: antialiased; }
-a { color: var(--accent); text-decoration: none; transition: opacity 0.3s ease; }
-a:hover { opacity: 0.8; }
-.container { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
-
-header { padding: 18px 0; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); z-index: 100; }
-.header-inner { display: flex; justify-content: space-between; align-items: center; }
-.logo { font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
-.logo span { color: var(--accent); }
-.gh-link { font-size: 14px; color: var(--secondary); padding: 8px 20px; border: 1px solid var(--border); border-radius: var(--radius-pill); transition: all 0.3s ease; }
-.gh-link:hover { color: var(--text); border-color: rgba(255,255,255,0.25); }
-
-.hero { text-align: center; padding: 80px 0 48px; }
-.hero h1 { font-size: clamp(36px, 5.5vw, 56px); font-weight: 700; letter-spacing: -0.03em; margin-bottom: 12px; }
-.hero p { font-size: 19px; color: var(--secondary); max-width: 540px; margin: 0 auto 28px; }
-.tech-tags { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-.tech-tag { font-size: 12px; color: var(--secondary); padding: 6px 14px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--card-bg); }
-
-.stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 40px 0; }
-.stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 24px; text-align: center; backdrop-filter: blur(20px); }
-.stat-value { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; }
-.stat-label { font-size: 13px; color: var(--secondary); margin-top: 4px; }
-
-.section { padding: 40px 0; }
-.section-title { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 20px; }
-.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 32px; backdrop-filter: blur(20px); transition: border-color 0.3s ease; }
-.card:hover { border-color: rgba(255,255,255,0.15); }
-
-input[type="number"], input[type="text"] {
-  width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border);
-  border-radius: var(--radius-input); padding: 12px 16px; color: var(--text);
-  font-family: var(--font); font-size: 14px; outline: none; transition: border-color 0.3s ease;
+html,body{height:100%;width:100%;background:var(--bg);color:var(--fg);}
+body{
+  font-family:'IBM Plex Mono','JetBrains Mono',Consolas,'Courier New',monospace;
+  font-size:12.5px;
+  line-height:1.35;
+  overflow:hidden;
+  letter-spacing:0.2px;
+  -webkit-font-smoothing:none;
+  font-variant-ligatures:none;
 }
-input:focus { border-color: var(--accent); }
-::placeholder { color: var(--secondary); }
-label { font-size: 13px; color: var(--secondary); display: block; margin-bottom: 6px; }
-
-.btn { display: inline-flex; align-items: center; padding: 12px 28px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-pill); font-family: var(--font); font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.3s ease; }
-.btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
-.btn:active { transform: translateY(0); }
-
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
-.form-full { grid-column: 1 / -1; }
-
-.slider-row { display: flex; align-items: center; gap: 12px; }
-.slider-row input[type="range"] { flex: 1; -webkit-appearance: none; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; outline: none; }
-.slider-row input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; }
-.slider-val { font-size: 13px; color: var(--accent); min-width: 40px; text-align: right; font-family: monospace; }
-
-.result-box { display: none; margin-top: 20px; padding: 24px; border-radius: 14px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); text-align: center; }
-.result-box.show { display: block; animation: fadeIn 0.3s ease; }
-.result-verdict { font-size: 36px; font-weight: 700; letter-spacing: -0.02em; }
-.result-conf { font-size: 15px; color: var(--secondary); margin-top: 4px; }
-
-/* Model comparison table */
-.model-table { width: 100%; border-collapse: collapse; }
-.model-table th, .model-table td { padding: 12px 16px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--border); }
-.model-table th { color: var(--secondary); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
-.model-table td.best { color: var(--green); font-weight: 600; }
-
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-
-/* Dataset stats */
-.ds-stat { text-align: center; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 14px; border: 1px solid var(--border); }
-.ds-stat .val { font-size: 22px; font-weight: 700; color: var(--accent); }
-.ds-stat .lbl { font-size: 12px; color: var(--secondary); margin-top: 4px; }
-
-/* Confusion matrix */
-.cm-grid { display: grid; grid-template-columns: auto 1fr 1fr; grid-template-rows: auto 1fr 1fr; gap: 4px; max-width: 280px; margin: 0 auto; }
-.cm-label { font-size: 12px; color: var(--secondary); display: flex; align-items: center; justify-content: center; padding: 8px; }
-.cm-label.rotate { writing-mode: vertical-rl; transform: rotate(180deg); }
-.cm-cell { border-radius: 10px; padding: 16px 8px; text-align: center; font-size: 13px; font-weight: 600; }
-.cm-cell .cm-val { font-size: 20px; display: block; margin-bottom: 2px; }
-.cm-tp { background: rgba(48,209,88,0.15); color: var(--green); }
-.cm-tn { background: rgba(48,209,88,0.08); color: var(--green); }
-.cm-fp { background: rgba(255,69,58,0.1); color: var(--red); }
-.cm-fn { background: rgba(255,159,10,0.1); color: var(--orange); }
-.cm-header { font-size: 11px; color: var(--secondary); text-align: center; padding: 6px; text-transform: uppercase; letter-spacing: 0.04em; }
-
-/* ROC Curve */
-.roc-container { position: relative; width: 100%; max-width: 280px; margin: 0 auto; }
-.roc-container svg { width: 100%; height: auto; }
-
-footer { padding: 40px 0; border-top: 1px solid var(--border); margin-top: 48px; text-align: center; }
-footer p { font-size: 14px; color: var(--secondary); }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-@media (max-width: 768px) {
-  .stats-bar { grid-template-columns: repeat(2, 1fr); }
-  .two-col { grid-template-columns: 1fr; }
-  .three-col { grid-template-columns: 1fr; }
-  .form-grid { grid-template-columns: 1fr; }
-  .hero { padding: 48px 0 32px; }
+a{color:var(--fg);text-decoration:none;}
+button,input{
+  font-family:inherit;
+  font-size:inherit;
+  color:var(--fg);
+  background:var(--bg);
+  border:1px solid var(--line);
+  border-radius:0;
+  outline:none;
+  padding:3px 8px;
 }
-@media (max-width: 480px) { .stats-bar { grid-template-columns: 1fr; } }
+button:hover{background:var(--hl);cursor:pointer;}
+input:focus{border-color:var(--fg);}
+input[type=range]{
+  -webkit-appearance:none;
+  appearance:none;
+  height:4px;
+  background:var(--line);
+  border:none;
+  padding:0;
+  width:100%;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:10px;
+  height:14px;
+  background:var(--fg);
+  border-radius:0;
+  cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:10px;height:14px;background:var(--fg);border:none;border-radius:0;cursor:pointer;
+}
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--line);}
+::-webkit-scrollbar-thumb:hover{background:var(--fg);}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--line);
+  padding:4px 10px;
+  text-transform:uppercase;
+  font-weight:600;
+  font-size:12.5px;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.topbar .left{display:flex;gap:18px;}
+.topbar .cmd{color:var(--fg);}
+.topbar .cmd .lt,.topbar .cmd .gt{color:var(--dim);}
+.topbar .user{color:var(--dim);}
+.topbar .right{display:flex;gap:14px;align-items:center;}
+.topbar .clock{color:var(--fg);}
+.dot{
+  display:inline-block;
+  width:7px;height:7px;
+  background:var(--pos);
+  margin-right:6px;
+  vertical-align:middle;
+}
+.blink{animation:blink 1s steps(2,start) infinite;}
+@keyframes blink{to{visibility:hidden;}}
+
+.fnkeys{
+  display:flex;
+  gap:0;
+  border-bottom:1px solid var(--line);
+  padding:3px 8px;
+  font-size:12px;
+  color:var(--dim);
+  overflow-x:auto;
+  white-space:nowrap;
+}
+.fnkeys span{margin-right:18px;}
+.fnkeys .k{color:var(--fg);font-weight:700;}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;
+  gap:0;
+  height:calc(100vh - 28px - 26px - 22px);
+}
+.panel{
+  border-right:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
+}
+.panel:nth-child(2n){border-right:none;}
+.panel:nth-child(n+3){border-bottom:none;}
+.panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:4px 10px;
+  border-bottom:1px solid var(--line);
+  text-transform:uppercase;
+  font-weight:700;
+  letter-spacing:1px;
+  font-size:11.5px;
+  color:var(--fg);
+  background:var(--hl);
+}
+.panel-head .tag{color:var(--dim);font-weight:500;letter-spacing:0.5px;}
+.panel-body{
+  flex:1;
+  overflow:auto;
+  padding:6px 10px 10px 10px;
+}
+
+.feed-table{width:100%;border-collapse:collapse;font-size:12px;}
+.feed-table th{
+  text-align:left;
+  font-weight:600;
+  color:var(--dim);
+  text-transform:uppercase;
+  padding:2px 6px 4px 0;
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  background:var(--bg);
+}
+.feed-table td{padding:2px 6px 2px 0;white-space:nowrap;}
+.feed-table tr.leg{color:var(--pos);}
+.feed-table tr.fraud{color:var(--neg);}
+.feed-table tr.review{color:var(--fg);}
+.feed-table tr:hover td{background:var(--hl);}
+.feed-table .num{text-align:right;padding-right:10px;}
+.ticker-stats{
+  display:flex;
+  gap:14px;
+  font-size:11px;
+  color:var(--dim);
+  padding:4px 10px;
+  border-top:1px solid var(--line);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+.ticker-stats b{color:var(--fg);font-weight:600;}
+.ticker-stats .pos-v{color:var(--pos);}
+.ticker-stats .neg-v{color:var(--neg);}
+
+.analyze-grid{
+  display:grid;
+  grid-template-columns:110px 1fr 72px;
+  gap:6px 10px;
+  align-items:center;
+  font-size:12px;
+}
+.analyze-grid label{color:var(--dim);text-transform:uppercase;letter-spacing:0.5px;}
+.analyze-grid input[type=text],
+.analyze-grid input[type=number]{
+  width:100%;
+  padding:3px 6px;
+  text-align:right;
+}
+.analyze-actions{
+  display:flex;
+  gap:6px;
+  margin-top:10px;
+}
+.analyze-actions button{
+  flex:1;
+  padding:5px 8px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-weight:600;
+}
+.btn-primary{background:var(--fg);color:#000;border-color:var(--fg);}
+.btn-primary:hover{background:#ffc04d;color:#000;}
+.btn-ghost{background:var(--bg);}
+
+.pred-box{
+  margin-top:10px;
+  border:1px solid var(--line);
+  padding:0;
+  font-size:12px;
+}
+.pred-box .bar{
+  background:var(--hl);
+  padding:3px 8px;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--fg);
+  border-bottom:1px solid var(--line);
+  font-weight:700;
+}
+.pred-box table{width:100%;border-collapse:collapse;}
+.pred-box td{padding:3px 8px;white-space:nowrap;}
+.pred-box td.k{color:var(--dim);width:140px;text-transform:uppercase;letter-spacing:0.5px;}
+.pred-box td.v{color:var(--fg);font-weight:600;}
+.pred-box .fraud-row td.v{color:var(--neg);}
+.pred-box .leg-row td.v{color:var(--pos);}
+.conf-bar{
+  height:6px;
+  background:var(--line);
+  position:relative;
+  margin-top:2px;
+}
+.conf-bar > span{
+  position:absolute;
+  left:0;top:0;bottom:0;
+  background:var(--fg);
+}
+.conf-bar.fraud > span{background:var(--neg);}
+.conf-bar.leg > span{background:var(--pos);}
+
+pre.ascii{
+  font-family:inherit;
+  font-size:12px;
+  color:var(--fg);
+  line-height:1.3;
+  white-space:pre;
+  margin:0;
+}
+pre.ascii .dim{color:var(--dim);}
+pre.ascii .pos{color:var(--pos);}
+pre.ascii .neg{color:var(--neg);}
+pre.ascii .star{color:var(--fg);font-weight:700;}
+pre.ascii .hl{background:var(--hl);}
+
+.roc-wrap{
+  display:grid;
+  grid-template-columns:1.1fr 1fr;
+  gap:14px;
+  align-items:start;
+  margin-top:6px;
+}
+.roc-svg{
+  background:var(--bg);
+  border:1px solid var(--line);
+  width:100%;
+  height:auto;
+}
+.cm-wrap pre.ascii{font-size:12px;}
+.sub-title{
+  font-size:11px;
+  color:var(--dim);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin:6px 0 4px 0;
+  border-bottom:1px solid var(--line);
+  padding-bottom:2px;
+}
+
+.statusbar{
+  height:22px;
+  border-top:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 10px;
+  font-size:11.5px;
+  color:var(--dim);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  overflow:hidden;
+  white-space:nowrap;
+}
+.statusbar .seg{margin-right:16px;}
+.statusbar b{color:var(--fg);font-weight:600;}
+.statusbar .pos-v{color:var(--pos);}
+.statusbar .neg-v{color:var(--neg);}
+
+.note{
+  color:var(--dim);
+  font-size:11.5px;
+  margin-top:8px;
+  border-top:1px dashed var(--line);
+  padding-top:6px;
+  line-height:1.45;
+}
+.note b{color:var(--fg);font-weight:600;}
+
+.flash-fraud{animation:flashN 1s ease-out 1;}
+.flash-leg{animation:flashP 1s ease-out 1;}
+@keyframes flashN{0%{background:#3a0e0d;}100%{background:transparent;}}
+@keyframes flashP{0%{background:#0e2810;}100%{background:transparent;}}
+
+@media (max-width:1100px){
+  .grid{grid-template-columns:1fr;grid-template-rows:repeat(4,minmax(320px,1fr));}
+  .panel{border-right:none;}
+  .panel:nth-child(n){border-bottom:1px solid var(--line);}
+  .panel:last-child{border-bottom:none;}
+  .roc-wrap{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="container header-inner">
-    <div class="logo">Fraud<span>Shield</span></div>
-    <a href="https://github.com/Vikrant892/credit-card-fraud-detection" target="_blank" rel="noopener" class="gh-link">GitHub</a>
+  <div class="topbar">
+    <div class="left">
+      <div class="cmd">FRDS<span class="lt">&lt;</span>GO<span class="gt">&gt;</span></div>
+      <div class="user">VIKRANT-SHARMA</div>
+      <div class="user">ANALYTICS</div>
+      <div class="user">CREDIT CARD FRAUD</div>
+    </div>
+    <div class="right">
+      <div><span class="dot"></span><span id="feedState">LIVE</span></div>
+      <div class="clock" id="clock">00:00:00 AEST</div>
+    </div>
   </div>
-</header>
 
-<main class="container">
-  <section class="hero">
-    <h1>Real-Time Credit Card Fraud Detection</h1>
-    <p>Machine learning models trained on 284,807 transactions to detect fraudulent activity with high precision and recall.</p>
-    <div class="tech-tags">
-      <span class="tech-tag">Python</span><span class="tech-tag">Scikit-learn</span><span class="tech-tag">XGBoost</span><span class="tech-tag">Pandas</span><span class="tech-tag">SMOTE</span>
-    </div>
-  </section>
+  <div class="fnkeys">
+    <span><span class="k">[F1]</span> HELP</span>
+    <span><span class="k">[F2]</span> MODELS</span>
+    <span><span class="k">[F3]</span> ANALYZE</span>
+    <span><span class="k">[F4]</span> STATS</span>
+    <span><span class="k">[F5]</span> ROC</span>
+    <span><span class="k">[F6]</span> CM</span>
+    <span><span class="k">[F7]</span> LOG</span>
+    <span><span class="k">[SPC]</span> PAUSE FEED</span>
+    <span><span class="k">[N]</span> NEW TX</span>
+  </div>
 
-  <section class="stats-bar">
-    <div class="stat-card"><div class="stat-value" style="color:var(--accent)" id="statTx">0</div><div class="stat-label">Transactions Processed</div></div>
-    <div class="stat-card"><div class="stat-value" style="color:var(--red)" id="statFraud">0</div><div class="stat-label">Fraud Detected</div></div>
-    <div class="stat-card"><div class="stat-value" style="color:var(--green)" id="statF1">0</div><div class="stat-label">F1 Score</div></div>
-    <div class="stat-card"><div class="stat-value" style="color:var(--orange)" id="statFPR">0%</div><div class="stat-label">False Positive Rate</div></div>
-  </section>
-
-  <!-- Transaction Analyzer -->
-  <section class="section">
-    <div class="card">
-      <h2 class="section-title">Transaction Analyzer</h2>
-      <div class="form-grid">
-        <div>
-          <label>Amount ($)</label>
-          <input type="number" id="inputAmount" placeholder="149.62" step="0.01" min="0">
-        </div>
-        <div>
-          <label>Time (seconds from first tx)</label>
-          <input type="number" id="inputTime" placeholder="86400" min="0">
-        </div>
+  <div class="grid">
+    <div class="panel" id="p-feed">
+      <div class="panel-head">
+        <div>&#9632; LIVE TRANSACTION FEED <span class="tag">&middot; INFER &middot; XGBOOST v0.9.3</span></div>
+        <div class="tag" id="feedRate">0.0 TX/SEC</div>
       </div>
-      <p style="font-size:14px;color:var(--secondary);margin-bottom:14px;">PCA-transformed features</p>
-      <div id="sliderContainer" style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;"></div>
-      <button class="btn" id="analyzeBtn">Analyze Transaction</button>
-      <div class="result-box" id="txResult">
-        <div class="result-verdict" id="txVerdict"></div>
-        <div class="result-conf" id="txConf"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Dataset Stats -->
-  <section class="section">
-    <h2 class="section-title">Dataset Overview</h2>
-    <div class="three-col">
-      <div class="ds-stat"><div class="val">284,807</div><div class="lbl">Total Transactions</div></div>
-      <div class="ds-stat"><div class="val" style="color:var(--red)">492</div><div class="lbl">Fraudulent (0.172%)</div></div>
-      <div class="ds-stat"><div class="val" style="color:var(--green)">SMOTE</div><div class="lbl">Oversampling Applied</div></div>
-    </div>
-  </section>
-
-  <!-- Model Comparison + Confusion Matrix + ROC -->
-  <section class="section">
-    <div class="card" style="margin-bottom:24px;">
-      <h2 class="section-title">Model Comparison</h2>
-      <div style="overflow-x:auto;">
-        <table class="model-table">
-          <thead><tr><th>Model</th><th>Precision</th><th>Recall</th><th>F1 Score</th><th>AUC</th></tr></thead>
-          <tbody>
-            <tr><td>Logistic Regression</td><td>0.83</td><td>0.78</td><td>0.80</td><td>0.94</td></tr>
-            <tr><td>Random Forest</td><td>0.91</td><td>0.82</td><td>0.86</td><td>0.97</td></tr>
-            <tr><td style="color:var(--accent);font-weight:600">XGBoost</td><td class="best">0.93</td><td class="best">0.85</td><td class="best">0.87</td><td class="best">0.98</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="two-col">
-      <div class="card">
-        <h2 class="section-title">Confusion Matrix</h2>
-        <p style="font-size:13px;color:var(--secondary);margin-bottom:16px;">XGBoost on test set (n=56,962)</p>
-        <div class="cm-grid">
-          <div></div>
-          <div class="cm-header">Pred. Legit</div>
-          <div class="cm-header">Pred. Fraud</div>
-          <div class="cm-label rotate">Actual Legit</div>
-          <div class="cm-cell cm-tn"><span class="cm-val">56,850</span>TN</div>
-          <div class="cm-cell cm-fp"><span class="cm-val">12</span>FP</div>
-          <div class="cm-label rotate">Actual Fraud</div>
-          <div class="cm-cell cm-fn"><span class="cm-val">15</span>FN</div>
-          <div class="cm-cell cm-tp"><span class="cm-val">85</span>TP</div>
+      <div class="panel-body" style="padding:0;">
+        <div style="padding:4px 10px 0 10px;">
+          <table class="feed-table" id="feedTable" aria-label="live transactions">
+            <thead>
+              <tr>
+                <th>TIME</th>
+                <th class="num">AMT</th>
+                <th class="num">V1</th>
+                <th class="num">V2</th>
+                <th class="num">V3</th>
+                <th class="num">V4</th>
+                <th class="num">V5</th>
+                <th>PRED</th>
+                <th class="num">CONF</th>
+              </tr>
+            </thead>
+            <tbody id="feedBody"></tbody>
+          </table>
         </div>
       </div>
+      <div class="ticker-stats">
+        <span><b id="statTotal">0</b> TOTAL</span>
+        <span class="pos-v">LEG <b id="statLeg">0</b></span>
+        <span class="neg-v">FRAUD <b id="statFraud">0</b></span>
+        <span>REVIEW <b id="statRev">0</b></span>
+        <span>RATE <b id="statRate">0.00%</b></span>
+      </div>
+    </div>
 
-      <div class="card">
-        <h2 class="section-title">ROC Curve</h2>
-        <p style="font-size:13px;color:var(--secondary);margin-bottom:16px;">AUC = 0.98 (XGBoost)</p>
-        <div class="roc-container">
-          <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-            <!-- Grid -->
-            <rect x="30" y="10" width="220" height="220" fill="rgba(255,255,255,0.02)" rx="4"/>
-            <line x1="30" y1="230" x2="250" y2="230" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-            <line x1="30" y1="10" x2="30" y2="230" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-            <!-- Grid lines -->
-            <line x1="30" y1="175" x2="250" y2="175" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-            <line x1="30" y1="120" x2="250" y2="120" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-            <line x1="30" y1="65" x2="250" y2="65" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-            <line x1="85" y1="10" x2="85" y2="230" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-            <line x1="140" y1="10" x2="140" y2="230" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-            <line x1="195" y1="10" x2="195" y2="230" stroke="rgba(255,255,255,0.04)" stroke-width="0.5"/>
-            <!-- Diagonal (random) -->
-            <line x1="30" y1="230" x2="250" y2="10" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="4,4"/>
-            <!-- ROC Curve -->
-            <path d="M30,230 Q35,40 60,28 Q100,18 140,15 Q200,12 250,10" fill="none" stroke="#2997FF" stroke-width="2.5" stroke-linecap="round"/>
-            <!-- AUC fill -->
-            <path d="M30,230 Q35,40 60,28 Q100,18 140,15 Q200,12 250,10 L250,230 Z" fill="rgba(41,151,255,0.08)"/>
-            <!-- Labels -->
-            <text x="140" y="252" fill="#86868B" font-size="10" text-anchor="middle" font-family="var(--font)">False Positive Rate</text>
-            <text x="10" y="120" fill="#86868B" font-size="10" text-anchor="middle" font-family="var(--font)" transform="rotate(-90,10,120)">True Positive Rate</text>
-            <!-- Axis numbers -->
-            <text x="30" y="244" fill="#86868B" font-size="8" text-anchor="middle">0</text>
-            <text x="140" y="244" fill="#86868B" font-size="8" text-anchor="middle">0.5</text>
-            <text x="250" y="244" fill="#86868B" font-size="8" text-anchor="middle">1.0</text>
-            <text x="24" y="233" fill="#86868B" font-size="8" text-anchor="end">0</text>
-            <text x="24" y="123" fill="#86868B" font-size="8" text-anchor="end">0.5</text>
-            <text x="24" y="15" fill="#86868B" font-size="8" text-anchor="end">1.0</text>
-          </svg>
+    <div class="panel" id="p-analyze">
+      <div class="panel-head">
+        <div>&#9632; ANALYZE TRANSACTION <span class="tag">&middot; MANUAL INFERENCE</span></div>
+        <div class="tag">XGB &middot; THR=0.50</div>
+      </div>
+      <div class="panel-body">
+        <div class="analyze-grid">
+          <label>AMOUNT USD</label>
+          <input type="range" id="rAmt" min="0" max="5000" step="0.01" value="127.45">
+          <input type="number" id="nAmt" step="0.01" value="127.45" aria-label="amount">
+
+          <label>V1</label>
+          <input type="range" id="rV1" min="-10" max="10" step="0.01" value="-1.23">
+          <input type="number" id="nV1" step="0.01" value="-1.23" aria-label="v1">
+
+          <label>V2</label>
+          <input type="range" id="rV2" min="-10" max="10" step="0.01" value="0.45">
+          <input type="number" id="nV2" step="0.01" value="0.45" aria-label="v2">
+
+          <label>V3</label>
+          <input type="range" id="rV3" min="-10" max="10" step="0.01" value="0.67">
+          <input type="number" id="nV3" step="0.01" value="0.67" aria-label="v3">
+
+          <label>V4</label>
+          <input type="range" id="rV4" min="-10" max="10" step="0.01" value="-0.18">
+          <input type="number" id="nV4" step="0.01" value="-0.18" aria-label="v4">
+
+          <label>V5</label>
+          <input type="range" id="rV5" min="-10" max="10" step="0.01" value="0.92">
+          <input type="number" id="nV5" step="0.01" value="0.92" aria-label="v5">
+        </div>
+        <div class="analyze-actions">
+          <button class="btn-primary" id="btnAnalyze">&gt;&gt; SUBMIT</button>
+          <button class="btn-ghost" id="btnRandom">RANDOMIZE</button>
+          <button class="btn-ghost" id="btnReset">RESET</button>
+        </div>
+
+        <div class="pred-box" id="predBox">
+          <div class="bar">&#9552;&#9552;&#9552; PREDICTION &#9552;&#9552;&#9552;</div>
+          <table>
+            <tbody id="predBody">
+              <tr><td class="k">CLASS:</td><td class="v" id="pClass">&mdash;</td></tr>
+              <tr><td class="k">CONFIDENCE:</td><td class="v" id="pConf">&mdash;</td></tr>
+              <tr><td class="k">&nbsp;</td><td><div class="conf-bar" id="pConfBar"><span style="width:0"></span></div></td></tr>
+              <tr><td class="k">RISK TIER:</td><td class="v" id="pRisk">&mdash;</td></tr>
+              <tr><td class="k">RECOMMENDED:</td><td class="v" id="pRec">&mdash;</td></tr>
+              <tr><td class="k">TX SIGNATURE:</td><td class="v" id="pSig">&mdash;</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="note">
+          <b>NOTE.</b> Trained on the ULB public credit card fraud dataset (284,807 tx, 492 frauds). Features V1-V28 are PCA components &mdash; originals anonymized for privacy. Don't deploy this against real card traffic without retraining on current distribution.
         </div>
       </div>
     </div>
-  </section>
-</main>
 
-<footer><div class="container"><p>Built by Vikrant Sharma</p></div></footer>
+    <div class="panel" id="p-models">
+      <div class="panel-head">
+        <div>&#9632; MODEL COMPARISON <span class="tag">&middot; HOLDOUT 20% &middot; SMOTE TRAIN</span></div>
+        <div class="tag">N_TEST=56,961 &middot; FRAUD=98</div>
+      </div>
+      <div class="panel-body">
+<pre class="ascii" id="modelTable">
+MODEL            <span class="dim">PREC    RECALL  F1      AUC     FPR     LATENCY</span>
+<span class="dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>
+LOG REGRESSION   0.87    0.62    0.72    0.94    0.0003  <span class="dim">1.1ms</span>
+RANDOM FOREST    0.91    0.78    0.84    0.97    0.0002  <span class="dim">5.8ms</span>
+XGBOOST          0.93    0.85    0.87    0.98    0.0002  <span class="dim">3.2ms</span>  <span class="star">&#9733;</span>
+<span class="dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span>
+
+<span class="dim">FEATURES</span>        V1..V28 PCA COMPONENTS + TIME + AMOUNT   <span class="dim">(30 TOTAL)</span>
+<span class="dim">RESAMPLING</span>      SMOTE k=5 <span class="dim">(</span>TRAIN ONLY<span class="dim">; test left raw)</span>
+<span class="dim">THRESHOLD</span>       0.50 DEFAULT &middot; 0.35 AT CHALLENGER TIER
+<span class="dim">DRIFT WATCH</span>     PSI <span class="pos">0.04</span>  KS <span class="pos">0.07</span>  <span class="dim">(7d vs train)</span>
+<span class="dim">LAST TRAIN</span>      2025-01-14 02:17 UTC &middot; 42s WALL &middot; cpu only
+</pre>
+        <div class="sub-title">COMMENTARY</div>
+        <div style="font-size:11.5px;color:var(--dim);line-height:1.5;">
+          XGBoost wins on the class-imbalanced F1 after SMOTE oversampling. RF is close second. LR is included as a baseline &mdash; it reminds us how far a linear decision surface gets before precision collapses on PCA noise.
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="p-roc">
+      <div class="panel-head">
+        <div>&#9632; CONFUSION MATRIX &middot; ROC <span class="tag">&middot; XGBOOST @ THR=0.50</span></div>
+        <div class="tag">HOLDOUT &middot; 56,961</div>
+      </div>
+      <div class="panel-body">
+        <div class="roc-wrap">
+          <div class="cm-wrap">
+            <div class="sub-title">CONFUSION MATRIX</div>
+<pre class="ascii" id="cmTable">
+                <span class="dim">PRED LEG</span>      <span class="dim">PRED FRAUD</span>
+              <span class="dim">&#9484;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9516;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9488;</span>
+<span class="dim">TRUE LEG</span>      <span class="dim">&#9474;</span>  <span class="pos">56,850</span>   <span class="dim">&#9474;</span>    12      <span class="dim">&#9474;</span>
+              <span class="dim">&#9500;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9532;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9508;</span>
+<span class="dim">TRUE FRAUD</span>    <span class="dim">&#9474;</span>      15   <span class="dim">&#9474;</span>    <span class="neg">85</span>      <span class="dim">&#9474;</span>
+              <span class="dim">&#9492;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9524;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9496;</span>
+
+<span class="dim">TN</span> 56850   <span class="dim">FP</span>    12
+<span class="dim">FN</span>    15   <span class="dim">TP</span>    85
+
+<span class="dim">ACC</span>  0.99952   <span class="dim">PREC</span> 0.87629
+<span class="dim">REC</span>  0.85000   <span class="dim">F1</span>   0.86294
+</pre>
+          </div>
+
+          <div>
+            <div class="sub-title">ROC CURVE</div>
+            <svg class="roc-svg" viewBox="0 0 240 208" preserveAspectRatio="xMidYMid meet" aria-label="roc curve">
+              <rect x="34" y="14" width="190" height="150" fill="none" stroke="#3a2f14" stroke-width="1" shape-rendering="crispEdges"/>
+              <g stroke="#3a2f14" stroke-width="1" shape-rendering="crispEdges">
+                <line x1="34"  y1="52"  x2="224" y2="52"  stroke-dasharray="2,3"/>
+                <line x1="34"  y1="89"  x2="224" y2="89"  stroke-dasharray="2,3"/>
+                <line x1="34"  y1="126" x2="224" y2="126" stroke-dasharray="2,3"/>
+                <line x1="81"  y1="14"  x2="81"  y2="164" stroke-dasharray="2,3"/>
+                <line x1="128" y1="14"  x2="128" y2="164" stroke-dasharray="2,3"/>
+                <line x1="175" y1="14"  x2="175" y2="164" stroke-dasharray="2,3"/>
+              </g>
+              <line x1="34" y1="164" x2="224" y2="14" stroke="#8a7f5a" stroke-width="1" stroke-dasharray="3,3" shape-rendering="crispEdges"/>
+              <polyline
+                fill="none"
+                stroke="#f5a623"
+                stroke-width="1.4"
+                shape-rendering="crispEdges"
+                points="34,164 36,96 40,52 52,28 72,20 110,16 160,15 224,14" />
+              <rect x="48" y="24" width="5" height="5" fill="#eb4d4b" shape-rendering="crispEdges"/>
+              <text x="34"  y="180" fill="#8a7f5a" font-family="IBM Plex Mono, monospace" font-size="9">0.0</text>
+              <text x="124" y="180" fill="#8a7f5a" font-family="IBM Plex Mono, monospace" font-size="9">FPR</text>
+              <text x="212" y="180" fill="#8a7f5a" font-family="IBM Plex Mono, monospace" font-size="9">1.0</text>
+              <text x="8"   y="168" fill="#8a7f5a" font-family="IBM Plex Mono, monospace" font-size="9">0.0</text>
+              <text x="8"   y="92"  fill="#8a7f5a" font-family="IBM Plex Mono, monospace" font-size="9">TPR</text>
+              <text x="8"   y="18"  fill="#8a7f5a" font-family="IBM Plex Mono, monospace" font-size="9">1.0</text>
+              <text x="118" y="196" fill="#f5a623" font-family="IBM Plex Mono, monospace" font-size="10" text-anchor="middle">AUC = 0.98</text>
+              <text x="56"  y="33"  fill="#eb4d4b" font-family="IBM Plex Mono, monospace" font-size="9">OP@0.50</text>
+            </svg>
+
+            <div class="sub-title" style="margin-top:10px;">THRESHOLD GRID</div>
+<pre class="ascii">
+<span class="dim">THR     TPR     FPR     PREC    F1</span>
+0.30    0.91    0.0010  0.61    0.73
+0.40    0.88    0.0004  0.79    0.83
+<span class="hl">0.50    0.85    0.0002  0.88    0.86</span>
+0.60    0.80    0.0001  0.94    0.87
+0.70    0.73    0.0001  0.97    0.83
+</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div>
+      <span class="seg">DATASET: <b>ULB_2013</b></span>
+      <span class="seg">SAMPLES: <b>284,807</b></span>
+      <span class="seg">FRAUD: <b class="neg-v">492</b> (0.172%)</span>
+      <span class="seg">RESAMPLING: <b>SMOTE</b></span>
+      <span class="seg">LAST_TRAIN: <b>2025-01-14</b></span>
+    </div>
+    <div>
+      <span class="seg">UP <b class="pos-v" id="upTime">00:00:00</b></span>
+      <span class="seg">&copy; FRDS TERMINAL</span>
+    </div>
+  </div>
 
 <script>
-(function () {
-  function animateCount(el, target, suffix, decimals) {
-    suffix = suffix || '';
-    decimals = decimals || 0;
-    var cur = 0, step = target / 35;
-    var iv = setInterval(function () {
-      cur += step;
-      if (cur >= target) { cur = target; clearInterval(iv); }
-      el.textContent = (decimals > 0 ? cur.toFixed(decimals) : Math.round(cur).toLocaleString()) + suffix;
-    }, 30);
+(function(){
+  'use strict';
+
+  var startedAt = Date.now();
+  function two(n){return (n<10?'0':'')+n;}
+  function fmtTime(d){return two(d.getHours())+':'+two(d.getMinutes())+':'+two(d.getSeconds());}
+  function fmtDur(ms){
+    var s = Math.floor(ms/1000);
+    var h = Math.floor(s/3600); s -= h*3600;
+    var m = Math.floor(s/60);   s -= m*60;
+    return two(h)+':'+two(m)+':'+two(s);
   }
-  animateCount(document.getElementById('statTx'), 284807);
-  animateCount(document.getElementById('statFraud'), 492);
-  animateCount(document.getElementById('statF1'), 0.87, '', 2);
-  animateCount(document.getElementById('statFPR'), 0.02, '%', 2);
+  function tickClock(){
+    var d = new Date();
+    document.getElementById('clock').textContent = fmtTime(d)+' AEST';
+    document.getElementById('upTime').textContent = fmtDur(Date.now()-startedAt);
+  }
+  tickClock(); setInterval(tickClock, 1000);
 
-  var pcaFeatures = ['V1','V2','V3','V4','V5'];
-  var defaults = [-1.36, -0.07, 2.54, 1.38, -0.34];
-  var container = document.getElementById('sliderContainer');
+  function randn(){
+    var u=0,v=0;
+    while(u===0) u = Math.random();
+    while(v===0) v = Math.random();
+    return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+  }
+  function rand(min,max){return Math.random()*(max-min)+min;}
+  function fx(n, d){return (n>=0?' ':'') + n.toFixed(d);}
+  function fmtMoney(n){
+    var s = n.toFixed(2);
+    var parts = s.split('.');
+    var whole = parts[0];
+    var out = '';
+    for(var i=whole.length, c=0; i>0; i--, c++){
+      if(c && c%3===0) out = ','+out;
+      out = whole.charAt(i-1) + out;
+    }
+    return '$'+out+'.'+parts[1];
+  }
+  function genTxId(){
+    var s='TX';
+    for(var i=0;i<8;i++) s += '0123456789ABCDEF'.charAt(Math.floor(Math.random()*16));
+    return s;
+  }
 
-  pcaFeatures.forEach(function (name, i) {
-    var row = document.createElement('div');
-    row.className = 'slider-row';
-    row.innerHTML = '<label style="min-width:28px;margin-bottom:0">' + name + '</label>'
-      + '<input type="range" min="-5" max="5" step="0.01" value="' + defaults[i] + '" data-idx="' + i + '">'
-      + '<span class="slider-val" id="sv' + i + '">' + defaults[i].toFixed(2) + '</span>';
-    container.appendChild(row);
-    row.querySelector('input[type="range"]').addEventListener('input', function () {
-      document.getElementById('sv' + this.dataset.idx).textContent = parseFloat(this.value).toFixed(2);
+  // Demo scorer — logistic over a few PCA-like features. Tuned so ~1% of
+  // generated traffic flags as FRAUD and a few percent land in REVIEW.
+  // Not ULB weights; illustrative.
+  function scoreTx(tx){
+    var z =
+       -4.8
+     + (tx.amt > 1500 ? 1.3 : 0)
+     + (tx.amt > 500  ? 0.4 : 0)
+     - 0.80*tx.v1
+     + 0.55*tx.v2
+     - 0.35*tx.v3
+     + 0.62*tx.v4
+     - 0.28*tx.v5
+     + 0.15*(tx.v1*tx.v4)
+     - 0.10*(tx.v2*tx.v3);
+    var p = 1/(1+Math.exp(-z));
+    return Math.max(0, Math.min(1, p));
+  }
+  function classifyP(p){
+    if(p>=0.70) return 'FRAUD';
+    if(p>=0.40) return 'REVIEW';
+    return 'LEG';
+  }
+  function riskTier(p){
+    if(p>=0.85) return 'CRITICAL';
+    if(p>=0.70) return 'HIGH';
+    if(p>=0.40) return 'ELEVATED';
+    if(p>=0.15) return 'MODERATE';
+    return 'LOW';
+  }
+  function recommend(cls){
+    if(cls==='FRAUD')  return 'BLOCK & ESCALATE';
+    if(cls==='REVIEW') return 'HOLD FOR REVIEW';
+    return 'APPROVE';
+  }
+
+  var feedBody = document.getElementById('feedBody');
+  var feedState = document.getElementById('feedState');
+  var feedRate = document.getElementById('feedRate');
+  var paused = false;
+  var MAX_ROWS = 22;
+  var stats = {total:0, leg:0, fraud:0, review:0};
+  var feedTimer=null, rateWindow=[];
+
+  function genTx(){
+    var baseAmt = Math.exp(rand(1.1, 7.4));
+    var isFraudBias = Math.random() < 0.012;
+    var v1 = randn() + (isFraudBias ?  1.9 : 0);
+    var v2 = randn() + (isFraudBias ? -1.3 : 0);
+    var v3 = randn() + (isFraudBias ? -1.1 : 0);
+    var v4 = randn() + (isFraudBias ?  1.6 : 0);
+    var v5 = randn() + (isFraudBias ?  0.9 : 0);
+    var amt = isFraudBias ? baseAmt*1.6 : baseAmt;
+    return {amt:amt, v1:v1, v2:v2, v3:v3, v4:v4, v5:v5};
+  }
+
+  function cellNum(v){return '<td class="num">'+fx(v,2)+'</td>';}
+
+  function rowInner(d, tx, p, cls){
+    return '<td>'+fmtTime(d)+'</td>'
+      + '<td class="num">'+fmtMoney(tx.amt)+'</td>'
+      + cellNum(tx.v1)+cellNum(tx.v2)+cellNum(tx.v3)+cellNum(tx.v4)+cellNum(tx.v5)
+      + '<td>'+cls+'</td>'
+      + '<td class="num">'+p.toFixed(3)+'</td>';
+  }
+
+  function updateStats(){
+    document.getElementById('statTotal').textContent = stats.total;
+    document.getElementById('statLeg').textContent = stats.leg;
+    document.getElementById('statFraud').textContent = stats.fraud;
+    document.getElementById('statRev').textContent = stats.review;
+    var r = stats.total ? (100*stats.fraud/stats.total) : 0;
+    document.getElementById('statRate').textContent = r.toFixed(2)+'%';
+  }
+  function updateRate(){
+    var now = Date.now();
+    rateWindow = rateWindow.filter(function(t){return now-t < 5000;});
+    feedRate.textContent = (rateWindow.length/5).toFixed(1)+' TX/SEC';
+  }
+
+  function tallyAndInsert(d, tx, p, cls, flash){
+    var tr = document.createElement('tr');
+    tr.innerHTML = rowInner(d, tx, p, cls);
+    tr.className = (cls==='FRAUD' ? 'fraud' : (cls==='REVIEW' ? 'review' : 'leg'));
+    if(flash && cls==='FRAUD') tr.classList.add('flash-fraud');
+    feedBody.insertBefore(tr, feedBody.firstChild);
+    while(feedBody.rows.length > MAX_ROWS) feedBody.removeChild(feedBody.lastChild);
+    stats.total++;
+    if(cls==='FRAUD') stats.fraud++;
+    else if(cls==='REVIEW') stats.review++;
+    else stats.leg++;
+  }
+
+  function pushTx(){
+    if(paused) return;
+    var tx = genTx();
+    var p = scoreTx(tx);
+    var cls = classifyP(p);
+    tallyAndInsert(new Date(), tx, p, cls, true);
+    rateWindow.push(Date.now());
+    updateStats(); updateRate();
+  }
+
+  function seed(){
+    for(var i=0;i<14;i++){
+      var tx = genTx();
+      var p = scoreTx(tx);
+      var cls = classifyP(p);
+      var d = new Date(Date.now() - (14-i)*1300);
+      tallyAndInsert(d, tx, p, cls, false);
+      rateWindow.push(Date.now()-(14-i)*1300);
+    }
+    updateStats(); updateRate();
+  }
+
+  function startFeed(){
+    if(feedTimer) clearInterval(feedTimer);
+    feedTimer = setInterval(pushTx, 1500);
+  }
+  function togglePause(){
+    paused = !paused;
+    feedState.textContent = paused ? 'PAUSED' : 'LIVE';
+    feedState.classList.toggle('blink', paused);
+  }
+
+  seed();
+  startFeed();
+  setInterval(updateRate, 1000);
+
+  var fields = ['Amt','V1','V2','V3','V4','V5'];
+  var defaults = {Amt:127.45, V1:-1.23, V2:0.45, V3:0.67, V4:-0.18, V5:0.92};
+  fields.forEach(function(k){
+    var r = document.getElementById('r'+k);
+    var n = document.getElementById('n'+k);
+    r.addEventListener('input', function(){ n.value = r.value; liveRender(); });
+    n.addEventListener('input', function(){ r.value = n.value; liveRender(); });
+  });
+
+  function readForm(){
+    return {
+      amt: parseFloat(document.getElementById('nAmt').value)||0,
+      v1:  parseFloat(document.getElementById('nV1').value)||0,
+      v2:  parseFloat(document.getElementById('nV2').value)||0,
+      v3:  parseFloat(document.getElementById('nV3').value)||0,
+      v4:  parseFloat(document.getElementById('nV4').value)||0,
+      v5:  parseFloat(document.getElementById('nV5').value)||0
+    };
+  }
+
+  function renderPrediction(tx, p, flash){
+    var cls = classifyP(p);
+    var isFraud = (cls==='FRAUD');
+    var isLeg = (cls==='LEG');
+    var tier = riskTier(p);
+    var rec = recommend(cls);
+    var box = document.getElementById('predBox');
+    var classEl = document.getElementById('pClass');
+    var confEl  = document.getElementById('pConf');
+    var riskEl  = document.getElementById('pRisk');
+    var recEl   = document.getElementById('pRec');
+    var sigEl   = document.getElementById('pSig');
+    var bar     = document.getElementById('pConfBar');
+
+    classEl.textContent = cls==='FRAUD' ? 'FRAUDULENT' : (cls==='REVIEW' ? 'NEEDS REVIEW' : 'LEGITIMATE');
+    confEl.textContent  = p.toFixed(3);
+    riskEl.textContent  = tier;
+    recEl.textContent   = rec;
+    sigEl.textContent   = genTxId() + '  ' + fmtMoney(tx.amt);
+
+    var rows = box.querySelectorAll('tr');
+    rows.forEach(function(tr){tr.classList.remove('fraud-row','leg-row');});
+    if(isFraud) rows.forEach(function(tr){tr.classList.add('fraud-row');});
+    else if(isLeg) rows.forEach(function(tr){tr.classList.add('leg-row');});
+
+    bar.className = 'conf-bar' + (isFraud ? ' fraud' : (isLeg ? ' leg' : ''));
+    bar.firstElementChild.style.width = (p*100).toFixed(1)+'%';
+
+    if(flash){
+      box.classList.remove('flash-fraud','flash-leg');
+      void box.offsetWidth;
+      box.classList.add(isFraud ? 'flash-fraud' : 'flash-leg');
+    }
+  }
+
+  function liveRender(){
+    var tx = readForm();
+    renderPrediction(tx, scoreTx(tx), false);
+  }
+
+  document.getElementById('btnAnalyze').addEventListener('click', function(){
+    var tx = readForm();
+    renderPrediction(tx, scoreTx(tx), true);
+  });
+  document.getElementById('btnRandom').addEventListener('click', function(){
+    var tx = {
+      amt: Math.exp(rand(1.1, 7.0)),
+      v1: randn()*1.7, v2: randn()*1.7, v3: randn()*1.7, v4: randn()*1.7, v5: randn()*1.7
+    };
+    document.getElementById('nAmt').value = tx.amt.toFixed(2);
+    document.getElementById('rAmt').value = Math.min(5000, tx.amt).toFixed(2);
+    ['v1','v2','v3','v4','v5'].forEach(function(k){
+      var u = k.toUpperCase();
+      document.getElementById('n'+u).value = tx[k].toFixed(2);
+      document.getElementById('r'+u).value = Math.max(-10, Math.min(10, tx[k])).toFixed(2);
     });
+    renderPrediction(tx, scoreTx(tx), true);
+  });
+  document.getElementById('btnReset').addEventListener('click', function(){
+    document.getElementById('nAmt').value = defaults.Amt;
+    document.getElementById('rAmt').value = defaults.Amt;
+    ['V1','V2','V3','V4','V5'].forEach(function(k){
+      document.getElementById('n'+k).value = defaults[k];
+      document.getElementById('r'+k).value = defaults[k];
+    });
+    var tx = readForm();
+    renderPrediction(tx, scoreTx(tx), true);
   });
 
-  document.getElementById('analyzeBtn').addEventListener('click', function () {
-    var amount = parseFloat(document.getElementById('inputAmount').value) || 0;
-    var time = parseFloat(document.getElementById('inputTime').value) || 0;
-    var sliders = container.querySelectorAll('input[type="range"]');
-    var vals = [];
-    sliders.forEach(function (s) { vals.push(parseFloat(s.value)); });
+  liveRender();
 
-    var score = 0;
-    if (amount > 500) score += 15;
-    if (amount > 2000) score += 20;
-    if (amount > 5000) score += 15;
-    if (time < 3600) score += 5;
-    if (vals[0] < -2) score += 15;
-    if (vals[1] > 2.5) score += 10;
-    if (vals[2] < -1.5) score += 10;
-    if (vals[3] > 2) score += 8;
-    if (vals[4] < -2) score += 7;
-
-    var noise = (Math.random() - 0.5) * 6;
-    score = Math.max(0, Math.min(100, score + noise));
-    var isFraud = score > 40;
-    var confidence = isFraud ? (72 + Math.random() * 26).toFixed(1) : (80 + Math.random() * 19).toFixed(1);
-
-    var resultBox = document.getElementById('txResult');
-    var verdict = document.getElementById('txVerdict');
-    var conf = document.getElementById('txConf');
-
-    verdict.textContent = isFraud ? 'Fraudulent' : 'Legitimate';
-    verdict.style.color = isFraud ? 'var(--red)' : 'var(--green)';
-    conf.textContent = 'Confidence: ' + confidence + '% | Risk Score: ' + Math.round(score) + '/100';
-    resultBox.classList.add('show');
+  document.addEventListener('keydown', function(e){
+    if(e.target && (e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA')) return;
+    var k = e.key;
+    if(k===' '){ e.preventDefault(); togglePause(); }
+    else if(k==='n' || k==='N'){ pushTx(); }
+    else if(k==='r' || k==='R'){ document.getElementById('btnRandom').click(); }
+    else if(k==='a' || k==='A'){ document.getElementById('btnAnalyze').click(); }
   });
+
 })();
 </script>
 </body>
