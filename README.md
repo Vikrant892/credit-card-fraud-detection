@@ -1,10 +1,10 @@
 # Credit Card Fraud Detection
 
-Built this during my Masters coursework at the University of Adelaide. The goal was to build an end-to-end ML pipeline that detects fraudulent credit card transactions using the popular Kaggle dataset.
+Built this during my Master of IT coursework at the University of the Sunshine Coast (Adelaide campus). The goal was to build an end-to-end ML pipeline that detects fraudulent credit card transactions using the popular Kaggle dataset.
 
-The dataset is massively imbalanced (only 0.17% of transactions are fraud), so the main challenge was figuring out how to handle that. I ended up using SMOTE oversampling which made a huge difference — without it, the models basically just predicted everything as non-fraud and still got 99%+ accuracy, which is obviously useless.
+The dataset is massively imbalanced (only 0.17% of transactions are fraud), so the main challenge was figuring out how to handle that. I ended up using SMOTE oversampling which made a huge difference. Without it, the models basically just predicted everything as non-fraud and still got 99%+ accuracy, which is obviously useless.
 
-I trained three models — Logistic Regression, Random Forest, and XGBoost — and compared them. XGBoost performed the best overall, though Random Forest was close.
+I trained three models, Logistic Regression, Random Forest, and XGBoost, and compared them. XGBoost performed the best overall, though Random Forest was close.
 
 ## Dataset
 
@@ -65,7 +65,7 @@ XGBoost had the best balance of precision and recall. Random Forest had slightly
 ## What I Learned
 
 - Class imbalance is a real pain. Accuracy is a terrible metric when 99.8% of your data is one class. F1 score and AUC-ROC are much more meaningful.
-- SMOTE helps a lot but you have to be careful with the sampling ratio. Going full 1:1 actually made things worse — 0.5 was the sweet spot.
+- SMOTE helps a lot but you have to be careful with the sampling ratio. Going full 1:1 actually made things worse, 0.5 was the sweet spot.
 - XGBoost is impressively good out of the box. Even without much hyperparameter tuning it beat the other models.
 - Feature importance from Random Forest showed V14, V4, V12 were the most predictive features, which makes sense since those had the highest correlation with the target.
 
